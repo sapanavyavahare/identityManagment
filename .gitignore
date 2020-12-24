@@ -9,7 +9,11 @@
 #remove text file
 /sequelize-and-dbqueries.txt
 
-#zip file
+# file
 /Identity-managment
 
 /Identity-Managment-system
+
+#zip file
+/Identity-managment-first.zip
+/Identity-managment-second.zip
