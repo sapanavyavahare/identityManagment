@@ -1,0 +1,25 @@
+{
+    "name": "identity-management",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon ./bin/www ./src/"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "api-rsp": "^1.0.2",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "moment": "^2.29.1",
+        "mysql2": "^2.2.5",
+        "path": "^0.12.7",
+        "sequelize": "^6.3.5",
+        "swagger-ui-express": "^4.1.5",
+        "uuid": "^8.3.2"
+    }
+}

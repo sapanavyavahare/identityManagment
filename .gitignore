@@ -1,0 +1,10 @@
+/node_modules
+
+#remove
+
+
+#remove package-lock.json
+/package-lock.json
+
+#remove text file
+/sequelize-and-dbqueries.txt

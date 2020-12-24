@@ -1,0 +1,363 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Identity Managment  CRUD",
+        "description": "Identity Managment Application API"
+    },
+
+    "servers": [
+        {
+            "url": "http://localhost:5000/idm/api",
+            "description": "Local server"
+        }
+    ],
+
+    "tags": [
+        {
+            "name": "Enterprises",
+            "description": "API for enterprise in the system"
+        }
+    ],
+    "paths": {
+        "/permissions": {
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "Get all permission in the system",
+                "responses": {
+                    "200": {
+                        "description": "get all permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/permissionArray"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+                    "400": {
+                        "description": "Bad request. Request body must be json and parameterId must be arry of integer"
+                    },
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            }
+        },
+        "/permissions/search": {
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "get all permissions for specific feature",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "feature",
+                        "type": "string",
+                        "description": " feature name "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": " get all permissions for specific feature   successfully"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/roles": {
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "create role with permissions ",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createRole"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "role created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+                    "400": {
+                        "description": "Bad request. Request body must be json and parameterId must be arry of integer"
+                    },
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            },
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "get all roles in the system",
+                "responses": {
+                    "200": {
+                        "description": "get all roles successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/roleArray"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+                    "400": {
+                        "description": "Bad request. Request body must be json and parameterId must be arry of integer"
+                    },
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            },
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "update role with permission",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "role_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "name of role ",
+                                        "example": "dffg"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": " user"
+                                    },
+                                    "permission_id": {
+                                        "type": "integer",
+                                        "description": "permissions to that role",
+                                        "example": "2"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": " create  role   successfully"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/roles/{id}": {
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "get specifc role with permission by feature",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "role id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": " get specific  role with permission by feature   successfully"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "createRole": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "name of role "
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+
+                    "enterpriseCode": {
+                        "type": "string"
+                    },
+                    "permissionId": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "permissions to that role"
+                    }
+                },
+                "example": {
+                    "name": "BA Entities Role",
+                    "description": "Roles for CRUD Operations",
+                    "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
+                    "permissionId": [1, 2, 3]
+                }
+            }
+        },
+        "responses": {
+            "createRoleResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "status code "
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "sucess message from response"
+                    },
+                    "applicationErrorCode": {
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "code": 201,
+                    "message": "Role created successfully.",
+                    "applicationErrorCode": 0
+                }
+            },
+            "permissionArray": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": {
+                    "User": [
+                        {
+                            "id": 1,
+                            "name": "user_add",
+                            "description": "add user",
+                            "status": "A"
+                        }
+                    ]
+                }
+            },
+            "roleArray": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        },
+                        "permissions": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "roles": [
+                        {
+                            "id": 1,
+                            "name": "BA Entities Role",
+                            "description": "Roles for CRUD Operations",
+                            "status": "A",
+                            "permissions": [
+                                {
+                                    "id": 20,
+                                    "name": "resource_add",
+                                    "description": "Add Resource",
+                                    "status": "A"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "securitySchemes": {
+        "api_key": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        }
+    }
+}
