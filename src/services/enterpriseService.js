@@ -1,8 +1,10 @@
 const { successObject } = require('api-rsp');
+const _ = require('lodash');
 const moment = require('moment');
+const { transform } = require('node-json-transform');
 //const { Sequelize } = require('sequelize');
 const sequelize = require('sequelize');
-
+const { QueryTypes } = require('sequelize');
 const Op = sequelize.Op;
 
 //const { Transaction } = require('sequelize');
@@ -25,28 +27,27 @@ class EnterpriseService {
         this.permissionByFeature = {};
     }
     async getPermissions() {
-        try {
-            const features = await Permission.findAll({
-                attributes: [
-                    [
-                        sequelize.fn('DISTINCT', sequelize.col('feature')),
-                        'feature',
-                    ],
-                ],
-            });
-            for (const element of features) {
-                const permissions = await Permission.findAll({
-                    attributes: ['id', 'name', 'description', 'status'],
-                    where: { feature: element.feature },
+        const features = await Permission.findAll({
+            attributes: ['id', 'name', 'feature', 'description', 'status'],
+        });
+        var groupData = _.groupBy(features, (f) => {
+            return f.feature;
+        });
+
+        for (const value of Object.keys(groupData)) {
+            var objArray = [];
+            for (const obj of groupData[value]) {
+                objArray.push({
+                    id: obj.id,
+                    name: obj.name,
+                    description: obj.description,
+
+                    status: obj.status,
                 });
-
-                this.permissionByFeature[`${element.feature}`] = permissions;
+                groupData[value] = objArray;
             }
-
-            return this.permissionByFeature;
-        } catch (err) {
-            return err;
         }
+        return groupData;
     }
 
     async createRoleWithPermission(data) {
@@ -58,7 +59,7 @@ class EnterpriseService {
                 enterprise_code: data.enterpriseCode,
             },
             {
-                include: ['Permissions'],
+                include: ['permissions'],
             }
         );
         console.log('new Role ', newRole.get());
@@ -110,28 +111,26 @@ class EnterpriseService {
         return roles;
     }
 
-    async updateRole(data) {
-        return await Role.findByPk(data.role_id, {
-            include: ['Permissions'],
-        }).then(async (role) => {
-            console.log('status ', role.get().status);
-            await role.setPermissions(data.permission_id);
-            return await Role.update(
-                {
-                    name: data.name,
-                    description: data.description,
-                    status: role.get().status,
-                    enterprise_code: role.get().enterprise_code,
-                    updatedAt: moment(new Date()).format('YYYY-MM-DD HH:mm'),
-                },
-                {
-                    where: { role_id: data.role_id },
-                },
-                {
-                    include: ['Permissions'],
-                }
-            );
+    async updateRole(roleId, data) {
+        const role = await Role.findByPk(roleId, {
+            include: ['permissions'],
         });
+        console.log('status ', role.get().status);
+        await role.setPermissions(data.permissionId);
+        return await Role.update(
+            {
+                name: data.name,
+                description: data.description,
+                status: role.get().status,
+                enterprise_code: role.get().enterpriseCode,
+            },
+            {
+                where: { role_id: roleId },
+            },
+            {
+                include: ['permissions'],
+            }
+        );
     }
 
     // async getRoleById(id) {
@@ -140,21 +139,10 @@ class EnterpriseService {
     //     }).then(async (roles) => {
     //         var idArray = [];
     //         console.log('role ', JSON.stringify(roles));
-    //         for (const element of roles.get().Permissions) {
+    //         for (const element of roles.get().permissions) {
     //             idArray.push(element.id);
     //         }
-    //         for (const element of roles.get().Permissions) {
-    //             // var permissionArray = [];
-    //             // for (const permissionId of idArray) {
-    //             //     const permissions = {
-    //             //         id: permissionId,
-    //             //         name: element.name,
-    //             //         description: element.description,
-    //             //         status: element.status,
-    //             //     };
-    //             //     permissionArray.push(permissions);
-    //             // }
-
+    //         for (const element of roles.get().permissions) {
     //             const permissions = await Permission.findAll({
     //                 attributes: ['id', 'name', 'description', 'status'],
     //                 where: {
@@ -198,79 +186,75 @@ class EnterpriseService {
                 },
             ],
         });
+        if (roles == null) {
+            throw new Error('record with given  id not found ');
+        }
+        console.log('role ', roles);
+        const groupData = _.groupBy(roles.get().permissions, (f) => {
+            return f.feature;
+        });
 
-        console.log('role ', JSON.stringify(roles));
-        for (const element of roles.get().Permissions) {
-            var feature = element.feature;
-            if (feature == element.feature) {
-                idArray.push({
-                    id: element.id,
-                    name: element.name,
-                    description: element.description,
-                    status: element.status,
+        for (const value of Object.keys(groupData)) {
+            var objArray = [];
+            for (const obj of groupData[value]) {
+                objArray.push({
+                    id: obj.id,
+                    name: obj.name,
+                    description: obj.description,
+
+                    status: obj.status,
                 });
+                groupData[value] = objArray;
             }
         }
-        // for (const element of roles.get().Permissions) {
-        //     idArray.push(element.id);
-        // }
-        // for (const element of roles.get().Permissions) {
-        //     // var permissionArray = [];
-        //     // for (const permissionId of idArray) {
-        //     //     const permissions = {
-        //     //         id: permissionId,
-        //     //         name: element.name,
-        //     //         description: element.description,
-        //     //         status: element.status,
-        //     //     };
-        //     //     permissionArray.push(permissions);
-        //     // }
+        const roleResponse = new RoleResponse(
+            roles.get().role_id,
+            roles.get().name,
+            roles.get().description,
+            roles.get().status,
+            groupData
+        );
 
-        //     const permissions = await Permission.findAll({
-        //         attributes: ['id', 'name', 'description', 'status'],
-        //         where: {
-        //             [Op.and]: {
-        //                 id: idArray,
-        //                 feature: element.feature,
-        //             },
-        //         },
-        //     });
-        //     this.permissionByFeature[`${element.feature}`] = permissions;
-        // }
-        // const roleResponse = new RoleResponse(
-        //     roles.get().role_id,
-        //     roles.get().name,
-        //     roles.get().description,
-        //     roles.get().status,
-        //     this.permissionByFeature
-        // );
-
-        return roles;
+        return roleResponse;
     }
-    async getPermissionByFeature(feature) {
-        var permissionsFeature = {};
-        await Permission.findAll({
-            attributes: ['id', 'name', 'description'],
+    async getPermissionByFeature(featureArray) {
+        const permissions = await Permission.findAll({
+            attributes: ['id', 'name', 'description', 'status', 'feature'],
             where: {
-                feature: feature,
+                feature: [featureArray],
             },
-        }).then((permissions) => {
-            console.log('permissiosn ', permissions);
-
-            permissionsFeature[`${feature}`] = permissions;
         });
-        return permissionsFeature;
+
+        if (permissions === null) {
+            throw new Error('invalid feature value');
+        }
+        var groupData = _.groupBy(permissions, (f) => {
+            return f.feature;
+        });
+
+        for (const value of Object.keys(groupData)) {
+            var objArray = [];
+            for (const obj of groupData[value]) {
+                objArray.push({
+                    id: obj.id,
+                    name: obj.name,
+                    description: obj.description,
+
+                    status: obj.status,
+                });
+                groupData[value] = objArray;
+            }
+        }
+        return groupData;
     }
 
     async deleteRole(roleId) {
-        await Role.destroy({
+        return await Role.destroy({
             where: {
                 role_id: roleId,
             },
             cascade: true,
-            include: { model: Role_Permissions, cascade: true },
-        }).then((role) => {
-            console.log('delete role ', role);
+            include: ['permissions'],
         });
     }
 

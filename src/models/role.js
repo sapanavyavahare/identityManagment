@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'role_id',
                 as: 'permissions',
                 onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
             });
             Role.belongsToMany(models.user, {
                 through: 'User_Roles',

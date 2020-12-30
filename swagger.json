@@ -65,8 +65,7 @@
                         "content": {
                             "text/plain": {
                                 "schema": {
-                                    "type": "string",
-                                    "example": " get all permissions for specific feature   successfully"
+                                    "$ref": "#/components/responses/permissionArray"
                                 }
                             }
                         }
@@ -101,9 +100,7 @@
                     "401": {
                         "description": " Authorization information is missing or invalid."
                     },
-                    "400": {
-                        "description": "Bad request. Request body must be json and parameterId must be arry of integer"
-                    },
+
                     "500": {
                         "description": "Unexpected error. Internal server error."
                     }
@@ -133,52 +130,6 @@
                         "description": "Unexpected error. Internal server error."
                     }
                 }
-            },
-            "put": {
-                "tag": ["Enterprises"],
-                "summary": "update role with permission",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "role_id": {
-                                        "type": "integer",
-                                        "example": "1"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "description": "name of role ",
-                                        "example": "dffg"
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": " user"
-                                    },
-                                    "permission_id": {
-                                        "type": "integer",
-                                        "description": "permissions to that role",
-                                        "example": "2"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "type": "string",
-                                    "example": " create  role   successfully"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/roles/{id}": {
@@ -195,15 +146,104 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
                         "content": {
-                            "text/plain": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "example": " get specific  role with permission by feature   successfully"
+                                    "$ref": "#/components/responses/roleWithPermissionObject"
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/notFound"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "update role with given permissions ",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "role id "
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createRole"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "role created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 201,
+                                    "message": "Role updated successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            },
+            "delete": {
+                "tag": ["Enterprises"],
+                "summary": "delete role  ",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "role id "
+                    }
+                ],
+
+                "responses": {
+                    "200": {
+                        "description": "role deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Role deleted successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
                     }
                 }
             }
@@ -349,6 +389,64 @@
                             ]
                         }
                     ]
+                }
+            },
+            "roleWithPermissionObject": {
+                "type": "object",
+                "properties": {
+                    "role_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "permissionByFeature": {
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/components/responses/permissionArray"
+                        }
+                    }
+                },
+                "example": {
+                    "id": 1,
+                    "name": "BA Entities Role",
+                    "description": "Roles for CRUD Operations",
+                    "status": "A",
+                    "permissionByFeature": {
+                        "User": [
+                            {
+                                "id": 1,
+                                "name": "user_add",
+                                "description": "add user",
+                                "status": "A"
+                            }
+                        ]
+                    }
+                }
+            },
+            "notFound": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "httpCode": {
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "code": "GET_Role_FAILED",
+                    "message": "Unable to get role failed",
+                    "httpCode": 404
                 }
             }
         }

@@ -18,18 +18,9 @@ module.exports = (sequelize, DataTypes) => {
         {
             role_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: 'role',
-                    key: 'id',
-                },
-                onDelete: 'CASCADE',
             },
             permission_id: {
                 type: DataTypes.INTEGER,
-                references: {
-                    model: 'permission',
-                    key: 'id',
-                },
             },
         },
         {

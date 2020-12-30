@@ -8,15 +8,13 @@ class EnterpriseController {
             console.log('in conn');
 
             const result = await enterpriseService.getPermissions();
-            console.log('result in conn ', result);
+            //  console.log('result in conn ', result);
             res.send(result);
         } catch (err) {
-            console.error('Error in get permissions :: ', err);
-            return sendErrorRsp(res, {
-                code: 'GET_PERMISSIONS_FAILED',
-                message: 'Unable to get permission failed',
-                httpCode: 500,
-            });
+            console.error('Error in get role :: ', err);
+            return res
+                .status(500)
+                .send({ message: 'internal server error', error: err });
         }
     }
 
@@ -59,12 +57,15 @@ class EnterpriseController {
         try {
             console.log('in conn getrole', req.body.role_id);
 
-            const result = await enterpriseService.updateRole(req.body);
+            const result = await enterpriseService.updateRole(
+                req.params.id,
+                req.body
+            );
             console.log('result in conntroller ', result);
-            return sendSuccessRsp(res, {
-                code: '200',
-                message: 'Role updated successfully.',
-                applicationErrorCode: '0',
+            res.send({
+                code: 201,
+                message: 'Role updated successfully.',
+                applicationErrorCode: 0,
             });
         } catch (err) {
             console.error('Error in get trainer :: ', err);
@@ -82,20 +83,24 @@ class EnterpriseController {
 
             const result = await enterpriseService.getRoleById(req.params.id);
             console.log('result in conntroller ', result);
-            res.status(200).send({ roles: result });
+            res.status(200).send(result);
         } catch (err) {
             console.error('Error in get trainer :: ', err);
             return sendErrorRsp(res, {
-                code: 'GET_PERMISSIONS_FAILED',
-                message: 'Unable to get permission failed',
-                httpCode: 500,
+                code: 'GET_Role_FAILED',
+                message: 'Unable to get role failed',
+                httpCode: 404,
             });
         }
     }
     async getPermissionsByFeature(req, res) {
         try {
+            console.log('features ', req.query.feature);
+            var feature = req.query.feature;
+            var fetaureArray = feature.split(',');
+            console.log('feature array ', fetaureArray);
             const result = await enterpriseService.getPermissionByFeature(
-                req.query.feature
+                fetaureArray
             );
             console.log('result in conn ', result);
             res.send(result);
@@ -104,7 +109,7 @@ class EnterpriseController {
             return sendErrorRsp(res, {
                 code: 'GET_PERMISSIONS_FAILED',
                 message: 'Unable to get permission failed',
-                httpCode: 500,
+                httpCode: 404,
             });
         }
     }
@@ -114,7 +119,11 @@ class EnterpriseController {
 
             const result = await enterpriseService.deleteRole(req.params.id);
             console.log('result in conntroller ', result);
-            res.status(200).send({ success: true, Users: result });
+            res.send({
+                code: 200,
+                message: 'Role deleted successfully.',
+                applicationErrorCode: 0,
+            });
         } catch (err) {
             console.error('Error in get trainer :: ', err);
             return sendErrorRsp(res, {
