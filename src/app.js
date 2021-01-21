@@ -29,12 +29,12 @@ module.exports = () => {
         next();
     });
 
-    app.use(
-        cors({
-            allowedHeaders: ['content-type', 'Authorization'],
-            credentials: true,
-        })
-    );
+    // app.use(
+    //     cors({
+    //         allowedHeaders: ['content-type', 'Authorization'],
+    //         credentials: true,
+    //     })
+    // );
 
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json({ limit: '3mb' }));

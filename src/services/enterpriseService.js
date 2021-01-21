@@ -1,4 +1,5 @@
 const { successObject } = require('api-rsp');
+const { isPlainObject } = require('lodash');
 const _ = require('lodash');
 const moment = require('moment');
 const { transform } = require('node-json-transform');
@@ -9,18 +10,18 @@ const Op = sequelize.Op;
 
 //const { Transaction } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
-
+const { log } = require('winston');
+const logger = require('../config/configure-logger');
 const db = require('../models');
 //console.log('dbbbb ', db);
 const Permission = db.Permission;
 const Role = db.Role;
-const Role_Permissions = db.Role_Permissions;
 const Enterprise = db.Enterprise;
 const User = db.user;
 
 const User_Roles = db.User_Roles;
 
-const { RoleResponse } = require('../response-classes');
+const { RoleResponse, UserResponse } = require('../response-classes');
 
 class EnterpriseService {
     constructor() {
@@ -47,6 +48,7 @@ class EnterpriseService {
                 groupData[value] = objArray;
             }
         }
+
         return groupData;
     }
 
@@ -54,7 +56,7 @@ class EnterpriseService {
         const newRole = await Role.create(
             {
                 name: data.name,
-                desription: data.discription,
+                description: data.description,
                 status: 'A',
                 enterprise_code: data.enterpriseCode,
             },
@@ -65,32 +67,6 @@ class EnterpriseService {
         console.log('new Role ', newRole.get());
         await newRole.setPermissions(data.permissionId);
         return newRole;
-    }
-
-    async createUserWithRoles(data) {
-        return await User.create(
-            {
-                username: data.username,
-                email_id: data.email_id,
-                enterprise_code: data.enterprise_code,
-                user_type: 1,
-                name: data.name,
-                createdAt: moment(new Date()).format('YYYY-MM-DD HH:mm'),
-                updatedAt: moment(new Date()).format('YYYY-MM-DD HH:mm'),
-            },
-            {
-                include: ['Roles'],
-            }
-        ).then(async (newUser) => {
-            console.log('new user ', newUser);
-            return await newUser
-                .setRoles(data.role_id)
-                .then((joinTableData) => {
-                    console.log('role new ', newUser);
-                    // console.log('joined table data ', joinTableData);
-                    return newUser;
-                });
-        });
     }
 
     async getRolePermissions() {
@@ -133,38 +109,6 @@ class EnterpriseService {
         );
     }
 
-    // async getRoleById(id) {
-    //     return await Role.findByPk(id, {
-    //         include: ['permissions'],
-    //     }).then(async (roles) => {
-    //         var idArray = [];
-    //         console.log('role ', JSON.stringify(roles));
-    //         for (const element of roles.get().permissions) {
-    //             idArray.push(element.id);
-    //         }
-    //         for (const element of roles.get().permissions) {
-    //             const permissions = await Permission.findAll({
-    //                 attributes: ['id', 'name', 'description', 'status'],
-    //                 where: {
-    //                     [Op.and]: {
-    //                         id: idArray,
-    //                         feature: element.feature,
-    //                     },
-    //                 },
-    //             });
-    //             this.permissionByFeature[`${element.feature}`] = permissions;
-    //         }
-    //         const roleResponse = new RoleResponse(
-    //             roles.get().role_id,
-    //             roles.get().name,
-    //             roles.get().description,
-    //             roles.get().status,
-    //             this.permissionByFeature
-    //         );
-
-    //         return roleResponse;
-    //     });
-    // }
     async getRoleById(id) {
         const roles = await Role.findByPk(id, {
             attributes: ['role_id', 'name', 'description', 'status'],
@@ -186,9 +130,7 @@ class EnterpriseService {
                 },
             ],
         });
-        if (roles == null) {
-            throw new Error('record with given  id not found ');
-        }
+
         console.log('role ', roles);
         const groupData = _.groupBy(roles.get().permissions, (f) => {
             return f.feature;
@@ -258,10 +200,75 @@ class EnterpriseService {
         });
     }
 
+    async getUsers() {
+        var roleNames = [];
+        var permissionNames = [];
+        var userArray = [];
+        var roleArray;
+        const users = await User.findAll({
+            attributes: [
+                'id',
+                'username',
+                'name',
+                'email_id',
+                'enterprise_code',
+                'status',
+                'user_type',
+            ],
+            where: {
+                enterprise_code: '79622596-fc6a-4048-b0b6-ae40388fef8f',
+            },
+            include: {
+                model: Role,
+                as: 'Roles',
+                attributes: ['role_id', 'name', 'status'],
+                through: {
+                    attributes: [],
+                },
+                include: {
+                    model: Permission,
+                    as: 'permissions',
+                    attributes: ['name'],
+                    through: {
+                        attributes: [],
+                    },
+                },
+            },
+        });
+        for (const user of users) {
+            roleNames = _.map(user.Roles, 'name');
+            for (const iterator of user.Roles) {
+                permissionNames = _.map(iterator.permissions, 'name');
+            }
+            roleArray = user.Roles.map(function (obj) {
+                return {
+                    id: obj.role_id,
+                    name: obj.name,
+                    status: obj.status,
+                };
+            });
+
+            var userResponse = await new UserResponse(
+                user.id,
+                user.username,
+                user.name,
+                user.email_id,
+                user.enterprise_code,
+                user.status,
+                user.user_type,
+                roleNames,
+                permissionNames,
+                roleArray
+            );
+            userArray.push(userResponse);
+        }
+        return userArray;
+    }
+
     async createRootEnterprise(data) {
         const result = await db.sequelize
             .transaction(async (t) => {
-                return await Enterprise.create(
+                const enterprise = await Enterprise.create(
                     {
                         name: data.name,
                         status: 'Active',
@@ -275,58 +282,39 @@ class EnterpriseService {
                         ),
                     },
                     { transaction: t }
-                ).then(async (enterprise) => {
-                    console.log(
-                        'enterprise code ',
-                        enterprise.get().enterprise_code
-                    );
-                    return await this.createRoleWithPermission(
-                        {
-                            name: 'Admin',
-                            description: 'Admin of enterprise',
-                            status: 'A',
-                            enterprise_code: enterprise.get().enterprise_code,
-                            permission_id: [
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7,
-                                8,
-                                9,
-                                10,
-                                11,
-                                12,
-                                13,
-                                14,
-                                15,
-                                16,
-                                17,
-                                18,
-                            ],
-                        },
-                        { transaction: t }
-                    ).then(async (role) => {
-                        console.log('role created ', role);
-
-                        return await this.createUserWithRoles(
-                            {
-                                username: data.admin.username,
-                                email_id: data.admin.email_id,
-                                enterprise_code: enterprise.get()
-                                    .enterprise_code,
-                                name: data.admin.name,
-                                role_id: role.get().role_id,
-                            },
-                            { transaction: t }
-                        ).then((newUser) => {
-                            console.log('new user ', newUser);
-                            return enterprise.get().enterprise_code;
-                        });
-                    });
+                );
+                console.log(
+                    'enterprise code ',
+                    enterprise.get().enterprise_code
+                );
+                const permissionId = await Permission.findAll({
+                    attributes: ['id'],
                 });
+                console.log('permissionId ', permissionId);
+                const role = await this.createRoleWithPermission(
+                    {
+                        name: 'Admin',
+                        description: 'Admin of enterprise',
+                        status: 'A',
+                        enterpriseCode: enterprise.get().enterprise_code,
+                        permissionId: permissionId,
+                    },
+                    { transaction: t }
+                );
+                console.log('role created ', role);
+
+                const newUser = await this.createUserWithRoles(
+                    {
+                        username: data.admin.username,
+                        emailId: data.admin.emailId,
+                        enterpriseCode: enterprise.get().enterprise_code,
+                        name: data.admin.name,
+                        roles: 'Admin',
+                    },
+                    { transaction: t }
+                );
+                console.log('new user ', newUser);
+                return enterprise.get().enterprise_code;
             })
             .then((r) => {
                 console.log('result ', r);
@@ -335,7 +323,184 @@ class EnterpriseService {
             .catch((err) => {
                 console.log('err ', err);
             });
+        return result;
+    }
 
+    async createUserWithRoles(data) {
+        const newUser = await User.create(
+            {
+                username: data.username,
+                email_id: data.emailId,
+                enterprise_code: data.enterpriseCode,
+                user_type: 1,
+                name: data.name,
+            },
+            {
+                include: ['Roles'],
+            }
+        );
+        console.log('new user ', newUser);
+        const roleId = await Role.findAll({
+            where: {
+                [Op.and]: {
+                    name: data.roles,
+                    enterprise_code: data.enterpriseCode,
+                },
+            },
+        });
+        const result = await newUser.setRoles(roleId);
+    }
+
+    async deleteUser(userId) {
+        const result = await User.update(
+            {
+                status: 'D',
+            },
+            {
+                where: {
+                    id: userId,
+                },
+            }
+        );
+        return result;
+    }
+
+    async suspendUser(userId) {
+        const result = await User.update(
+            {
+                status: 'S',
+            },
+            {
+                where: {
+                    id: userId,
+                },
+            }
+        );
+        return result;
+    }
+    async activateUser(userId) {
+        const result = await User.update(
+            {
+                status: 'A',
+            },
+            {
+                where: {
+                    id: userId,
+                },
+            }
+        );
+        return result;
+    }
+    async getEnterpriseDetails() {
+        var roleNames = [];
+        var permissionNames = [];
+        const enterprise = await Enterprise.findOne({
+            where: {
+                enterprise_code: '4d00130a-6c8d-4b21-9f07-98b1ea37f855',
+            },
+        });
+        console.log('enterprise ', enterprise);
+        const user = await User.findOne({
+            attributes: [
+                'id',
+                'username',
+                'name',
+                'email_id',
+                'enterprise_code',
+                'status',
+                'user_type',
+            ],
+            where: {
+                enterprise_code: '4d00130a-6c8d-4b21-9f07-98b1ea37f855',
+            },
+            include: {
+                model: Role,
+                as: 'Roles',
+                attributes: ['name'],
+                where: {
+                    name: 'Admin',
+                },
+                through: {
+                    attributes: [],
+                },
+                include: {
+                    model: Permission,
+                    as: 'permissions',
+                    attributes: ['name'],
+                    through: {
+                        attributes: [],
+                    },
+                },
+            },
+        });
+        // console.log('user ', user);
+        roleNames = _.map(user.Roles, 'name');
+        for (const iterator of user.Roles) {
+            permissionNames = _.map(iterator.permissions, 'name');
+        }
+        var admin = {
+            id: user.id,
+            username: user.username,
+            name: user.name,
+            emailId: user.email_id,
+            enterpriseCode: user.enterprise_code,
+            status: user.status,
+            roleNames: roleNames,
+            permissionNames: permissionNames,
+            userType: user.user_type,
+        };
+        console.log('name ', enterprise.get().name);
+        var enterpriseDetails = {
+            name: enterprise.get().name,
+            status: enterprise.get().status,
+            enterpriseCode: enterprise.get().enterprise_code,
+            admin: admin,
+            createDate: enterprise.get().createdAt,
+            lastUpdatedDate: enterprise.get().updatedAt,
+            defaultRoles: null,
+            enterpriseType: enterprise.get().enterprise_type,
+        };
+        console.log('enterprise details ', enterpriseDetails);
+        return enterpriseDetails;
+    }
+    async suspendEnterprise(enterpriseId) {
+        const result = await Enterprise.update(
+            {
+                status: 'suspend',
+            },
+            {
+                where: {
+                    id: enterpriseId,
+                },
+            }
+        );
+        return result;
+    }
+
+    async activateEnterprise(enterpriseId) {
+        const result = await Enterprise.update(
+            {
+                status: 'active',
+            },
+            {
+                where: {
+                    id: enterpriseId,
+                },
+            }
+        );
+        return result;
+    }
+    async deleteEnterprise(enterpriseId) {
+        const result = await Enterprise.update(
+            {
+                status: 'deactivate',
+            },
+            {
+                where: {
+                    id: enterpriseId,
+                },
+            }
+        );
         return result;
     }
 }

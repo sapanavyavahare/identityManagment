@@ -247,6 +247,353 @@
                     }
                 }
             }
+        },
+        "/users/list": {
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "get all users",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/userListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/notFound"
+                                },
+                                "example": {
+                                    "code": "GET_USER_FAILED",
+                                    "message": "Unable to get user failed",
+                                    "httpCode": 500
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "create user with permission ",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "user created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 201,
+                                    "message": "User created successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "delete": {
+                "tag": ["Enterprises"],
+                "summary": "delete user  ",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "user id "
+                    }
+                ],
+
+                "responses": {
+                    "200": {
+                        "description": "user deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "User deleted successfully.",
+                                    "applicationErrorCode": 1114
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            }
+        },
+        "/users/suspend/{id}": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "suspend user sucessfully",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "user id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user suspended successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "User suspended successfully.",
+                                    "applicationErrorCode": 1114
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            }
+        },
+        "/users/activate/{id}": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "activate user sucessfully",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "user id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user activated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "User activated successfully.",
+                                    "applicationErrorCode": 1114
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            }
+        },
+        "/enterprises/root": {
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "create root enterprise ",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createEnterprise"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 201,
+                                    "message": "Enterprise created successfully.",
+                                    "enterpriseCode": "TY6Z-4TAH-W5X7",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enterprises": {
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "get enterprise details ",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/getEnterpriseDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "create root enterprise ",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createEnterprise"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 201,
+                                    "message": "Enterprise created successfully.",
+                                    "enterpriseCode": "TY6Z-4TAH-W5X7",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enterprises/{id}/suspend": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "suspent enterprise",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "enterprise id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Enterprise suspended successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enterprises/{id}/activate": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "suspent enterprise",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "enterprise id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Enterprise activated successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/enterprises/{id}/delete": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "delete enterprise",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "enterprise id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Enterprise deleted successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -278,6 +625,64 @@
                     "description": "Roles for CRUD Operations",
                     "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
                     "permissionId": [1, 2, 3]
+                }
+            },
+            "createEnterprise": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "admin": {
+                        "type": "object",
+                        "properties": {
+                            "emailId": { "type": "string" },
+                            "name": {
+                                "type": "string"
+                            },
+                            "username": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "name": "happiestminds",
+                    "admin": {
+                        "emailId": "hm.bng@happiestminds.com",
+                        "name": "happiestminds",
+                        "username": "happiestminds-admin"
+                    }
+                }
+            },
+            "createUser": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "emailId": {
+                        "type": "string"
+                    },
+                    "enterpriseCode": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": {
+                    "name": "HMT",
+                    "username": "HMT-ORG",
+                    "emailId": "abc.xyz@happiestminds.com",
+                    "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
+                    "roles": ["ADMIN", "DPO"]
                 }
             }
         },
@@ -329,6 +734,100 @@
                             "name": "user_add",
                             "description": "add user",
                             "status": "A"
+                        }
+                    ]
+                }
+            },
+            "userListResponse": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "username": {
+                            "type": "string"
+                        },
+                        "emailId": {
+                            "type": "string"
+                        },
+                        "enterpriseCode": {
+                            "type": "string"
+                        },
+                        "status": {
+                            "type": "string"
+                        },
+                        "userType": {
+                            "type": "integer"
+                        },
+                        "roleNames": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "permissionsNames": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "roles": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "users": [
+                        {
+                            "id": 1,
+                            "username": "HM-Org",
+                            "name": "Hm-org",
+                            "emailId": "manjunath.hindupur@happiestminds.com",
+                            "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
+                            "status": "A",
+                            "userType": 1,
+                            "roleNames": [
+                                "PL Delete Model",
+                                "PL User",
+                                "PL Export",
+                                "PL Assessment Template Co-ordinator",
+                                "Admin"
+                            ],
+                            "permissionNames": [
+                                "resource_fetch",
+                                "user_delete"
+                            ],
+                            "roles": [
+                                {
+                                    "id": 611,
+                                    "name": "PL User",
+                                    "status": "A"
+                                },
+                                {
+                                    "id": 622,
+                                    "name": "PL Assessment Approver",
+                                    "status": "A"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -447,6 +946,106 @@
                     "code": "GET_Role_FAILED",
                     "message": "Unable to get role failed",
                     "httpCode": 404
+                }
+            },
+            "getEnterpriseDetails": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "enterpriseCode": {
+                        "type": "string"
+                    },
+                    "admin": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "username": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "emailId": {
+                                "type": "string"
+                            },
+
+                            "enterpriseCode": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+
+                            "roleNames": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "permissionsNames": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "userType": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "createdDate": {
+                        "type": "string"
+                    },
+                    "lastUpdatedDate": {
+                        "type": "string"
+                    },
+                    "defaultRoles": {
+                        "type": "string"
+                    },
+                    "enterpriseType": {
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "name": "HM-org",
+                    "status": "Active",
+                    "enterpriseCode": "T16Z-4TAK-W5X7",
+                    "admin": {
+                        "id": 489,
+                        "username": "HM-Org",
+                        "name": "HM-org",
+                        "emailId": "manjunath.hindupur@happiestminds.com",
+                        "enterpriseCode": "T16Z-4TAK-W5X7",
+                        "status": "A",
+                        "roleNames": [
+                            "PL Delete Model",
+                            "PL User",
+                            "PL Assessment Template Co-ordinator",
+                            "Admin",
+                            "PL Export Request",
+                            "PL Assessment Approver"
+                        ],
+                        "permissionNames": [
+                            "user_delete",
+                            "resource_fetch",
+                            "businessprocess_add",
+                            "retentionrule_add",
+                            "import_data",
+                            "ia_approve"
+                        ],
+                        "userType": 1
+                    },
+                    "createDate": 1591803509000,
+                    "lastUpdateDate": 1591803509000,
+                    "defaultRoles": null,
+                    "enterpriseType": 1
                 }
             }
         }
