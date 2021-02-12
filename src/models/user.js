@@ -15,6 +15,14 @@ module.exports = (sequelize, DataTypes) => {
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE',
             });
+            user.hasMany(models.User_Activation_Key, {
+                foreignKey: 'user_id',
+                as: 'userActivationKey',
+            });
+            user.hasMany(models.User_Passwd_Hist, {
+                foreignKey: 'user_id',
+                as: 'passwordhists',
+            });
         }
     }
     user.init(

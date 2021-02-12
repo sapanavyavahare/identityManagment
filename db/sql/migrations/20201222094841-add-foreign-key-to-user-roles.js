@@ -9,6 +9,8 @@ module.exports = {
                 // User belongsTo Company 1:1
                 model: 'users',
                 key: 'id',
+                onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
             },
         });
     },

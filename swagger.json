@@ -20,10 +20,63 @@
         }
     ],
     "paths": {
+        "/auth": {
+            "post": {
+                "tag": ["Enterprises"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "username": "accentureBranch1-admin",
+                                "password": "S@pana12"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "enterpriseCode": {
+                                            "type": "string"
+                                        },
+                                        "userType": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/permissions": {
             "get": {
                 "tag": ["Enterprises"],
                 "summary": "Get all permission in the system",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "get all permissions",
@@ -51,6 +104,11 @@
             "get": {
                 "tag": ["Enterprises"],
                 "summary": "get all permissions for specific feature",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "query",
@@ -77,6 +135,11 @@
             "post": {
                 "tag": ["Enterprises"],
                 "summary": "create role with permissions ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -109,6 +172,11 @@
             "get": {
                 "tag": ["Enterprises"],
                 "summary": "get all roles in the system",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "get all roles successfully",
@@ -136,6 +204,11 @@
             "get": {
                 "tag": ["Enterprises"],
                 "summary": "get specifc role with permission by feature",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "path",
@@ -168,6 +241,11 @@
             "put": {
                 "tag": ["Enterprises"],
                 "summary": "update role with given permissions ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "path",
@@ -213,6 +291,11 @@
             "delete": {
                 "tag": ["Enterprises"],
                 "summary": "delete role  ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "path",
@@ -252,6 +335,11 @@
             "get": {
                 "tag": ["Enterprises"],
                 "summary": "get all users",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -283,6 +371,11 @@
             "post": {
                 "tag": ["Enterprises"],
                 "summary": "create user with permission ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -309,12 +402,83 @@
                         }
                     }
                 }
+            },
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "get logged in user details",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/userListResponse"
+                                },
+                                "example": {
+                                    "id": 1,
+                                    "username": "HM-Org",
+                                    "name": "Hm-org",
+                                    "emailId": "manjunath.hindupur@happiestminds.com",
+                                    "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
+                                    "status": "A",
+                                    "userType": 1,
+                                    "roleNames": [
+                                        "PL Delete Model",
+                                        "PL User",
+                                        "PL Export",
+                                        "PL Assessment Template Co-ordinator",
+                                        "Admin"
+                                    ],
+                                    "permissionNames": [
+                                        "resource_fetch",
+                                        "user_delete"
+                                    ],
+                                    "roles": [
+                                        {
+                                            "id": 611,
+                                            "name": "PL User",
+                                            "status": "A"
+                                        },
+                                        {
+                                            "id": 622,
+                                            "name": "PL Assessment Approver",
+                                            "status": "A"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/notFound"
+                                },
+                                "example": {
+                                    "code": "GET_USER_FAILED",
+                                    "message": "Unable to get user failed",
+                                    "httpCode": 500
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/users/{id}": {
             "delete": {
                 "tag": ["Enterprises"],
                 "summary": "delete user  ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "path",
@@ -354,6 +518,11 @@
             "put": {
                 "tag": ["Enterprises"],
                 "summary": "suspend user sucessfully",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "path",
@@ -392,6 +561,11 @@
             "put": {
                 "tag": ["Enterprises"],
                 "summary": "activate user sucessfully",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "in": "path",
@@ -422,6 +596,156 @@
 
                     "500": {
                         "description": "Unexpected error. Internal server error."
+                    }
+                }
+            }
+        },
+        "/users/activation/{activationKey}": {
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "activate user sucessfully",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "activationKey",
+                        "type": "string",
+                        "description": "user activation key "
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "newPassword": {
+                                        "type": "string"
+                                    },
+                                    "confirmPassword": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "user activated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "User activated successfully.",
+                                    "applicationErrorCode": 1114
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": " Authorization information is missing or invalid."
+                    },
+
+                    "500": {
+                        "description": "Unexpected error. Internal server error."
+                    }
+                }
+            }
+        },
+        "/users/passwd/change": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "change user password ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "newPassword": {
+                                        "type": "string"
+                                    },
+                                    "confirmPassword": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "username": "HM-Org",
+                                "password": "S@pana12",
+                                "newPassword": "Parag@1996",
+                                "confirmPassword": "Parag@1996"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Password change sucessfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/forgotpassword": {
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "forgot password ",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "username": "HM-Org"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Activation key generated.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -462,6 +786,11 @@
             "get": {
                 "tag": ["Enterprises"],
                 "summary": "get enterprise details ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -476,7 +805,12 @@
             },
             "post": {
                 "tag": ["Enterprises"],
-                "summary": "create root enterprise ",
+                "summary": "create  enterprise ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -509,6 +843,7 @@
             "put": {
                 "tag": ["Enterprises"],
                 "summary": "suspent enterprise",
+
                 "parameters": [
                     {
                         "in": "path",
@@ -538,7 +873,8 @@
         "/enterprises/{id}/activate": {
             "put": {
                 "tag": ["Enterprises"],
-                "summary": "suspent enterprise",
+                "summary": "activate enterprise",
+
                 "parameters": [
                     {
                         "in": "path",
@@ -566,7 +902,7 @@
             }
         },
         "/enterprises/{id}/delete": {
-            "put": {
+            "delete": {
                 "tag": ["Enterprises"],
                 "summary": "delete enterprise",
                 "parameters": [
@@ -594,6 +930,264 @@
                     }
                 }
             }
+        },
+        "/passwordpolicies": {
+            "post": {
+                "tag": ["Enterprises"],
+                "summary": "create password policy ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createPasswordPolicy"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 201,
+                                    "message": "Password policy created successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "fetch password policies ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/fetchPasswordPolicyResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "create password policy ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createPasswordPolicy"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Password policy updated successfully.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/passwordpolicies/{id}/activate": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "activate passwordpolicies sucessfully",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "policy id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Password Policy activated.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/passwordpolicies/{id}/deactivate": {
+            "put": {
+                "tag": ["Enterprises"],
+                "summary": "deactivate passwordpolicies sucessfully",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "policy id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Password Policy deactivated.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/passwordpolicies/{id}": {
+            "delete": {
+                "tag": ["Enterprises"],
+                "summary": "delete policy sucessfully",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "policy id "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/createRoleResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "message": "Password Policy deleted.",
+                                    "applicationErrorCode": 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/salt": {
+            "post": {
+                "tag": ["Enterprises"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "get": {
+                "tag": ["Enterprises"],
+                "summary": "logout from application",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statusCode": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "statusCode": 200,
+                                    "message": "successfully.logged.out"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -608,10 +1202,6 @@
                     "description": {
                         "type": "string"
                     },
-
-                    "enterpriseCode": {
-                        "type": "string"
-                    },
                     "permissionId": {
                         "type": "array",
                         "items": {
@@ -623,7 +1213,7 @@
                 "example": {
                     "name": "BA Entities Role",
                     "description": "Roles for CRUD Operations",
-                    "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
+
                     "permissionId": [1, 2, 3]
                 }
             },
@@ -667,9 +1257,7 @@
                     "emailId": {
                         "type": "string"
                     },
-                    "enterpriseCode": {
-                        "type": "string"
-                    },
+
                     "roles": {
                         "type": "array",
                         "items": {
@@ -681,8 +1269,37 @@
                     "name": "HMT",
                     "username": "HMT-ORG",
                     "emailId": "abc.xyz@happiestminds.com",
-                    "enterpriseCode": "79622596-fc6a-4048-b0b6-ae40388fef8f",
+
                     "roles": ["ADMIN", "DPO"]
+                }
+            },
+            "createPasswordPolicy": {
+                "type": "object",
+                "properties": {
+                    "policyName": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "minPasswordLength": {
+                        "type": "string"
+                    },
+                    "minLowAlphaChars": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "policyName": "Default Policy2",
+                    "description": "Admin User",
+                    "minPasswordLength": 8,
+                    "minLowerAlphaChars": 3,
+                    "minUpperAlphaChars": 2,
+                    "minNumericalChars": 1,
+                    "minSpecialChars": 1,
+                    "passwordHistoryLength": 1,
+                    "specialChars": "@",
+                    "passwordAge": 20
                 }
             }
         },
@@ -1047,14 +1664,63 @@
                     "defaultRoles": null,
                     "enterpriseType": 1
                 }
+            },
+            "fetchPasswordPolicyResponse": {
+                "type": "object",
+                "properties": {
+                    "passwordPolicies": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "policyId": {
+                                    "type": "integer"
+                                },
+                                "policyName": {
+                                    "type": "string"
+                                },
+                                "minPasswordLength": {
+                                    "type": "integer"
+                                },
+                                "minLowAlphaChars": {
+                                    "type": "object"
+                                },
+
+                                "minUpperAlphaChars": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "passwordPolicies": [
+                        {
+                            "policyId": 114,
+                            "policyName": "default",
+                            "description": "default",
+                            "minPasswordLength": 8,
+                            "minLowerAlphaChars": 3,
+                            "minUpperAlphaChars": 1,
+                            "minNumericalChars": 1,
+                            "minSpecialChars": 1,
+                            "passwordHistoryLength": 2,
+                            "specialChars": "~!@#$%^*&;?._",
+                            "status": "Active",
+                            "passwordAge": 90
+                        }
+                    ]
+                }
             }
-        }
-    },
-    "securitySchemes": {
-        "api_key": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "Authorization"
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "in": "header",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "name": "Authorization"
+            }
         }
     }
 }
