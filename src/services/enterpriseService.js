@@ -205,12 +205,40 @@ class EnterpriseService {
             }
         );
     }
-
-    async getUsers() {
+    async supportMethodForGetUser(user) {
         var roleNames = [];
         var permissionNames = [];
+        var permissionArray = [];
+        var roleArray = [];
+        roleNames = _.map(user.Roles, 'name');
+        for (const iterator of user.Roles) {
+            permissionNames = _.map(iterator.permissions, 'name');
+
+            permissionArray = _.union(permissionArray, permissionNames);
+        }
+        roleArray = user.Roles.map(function (obj) {
+            return {
+                id: obj.role_id,
+                name: obj.name,
+                status: obj.status,
+            };
+        });
+        const userResponse = await new UserResponse(
+            user.id,
+            user.username,
+            user.name,
+            user.email_id,
+            user.enterprise_code,
+            user.status,
+            user.user_type,
+            roleNames,
+            permissionArray,
+            roleArray
+        );
+        return userResponse;
+    }
+    async getUsers(enterpriseCode) {
         var userArray = [];
-        var roleArray;
         const users = await User.findAll({
             attributes: [
                 'id',
@@ -222,7 +250,7 @@ class EnterpriseService {
                 'user_type',
             ],
             where: {
-                enterprise_code: '79622596-fc6a-4048-b0b6-ae40388fef8f',
+                enterprise_code: enterpriseCode,
             },
             include: {
                 model: Role,
@@ -242,39 +270,14 @@ class EnterpriseService {
             },
         });
         for (const user of users) {
-            roleNames = _.map(user.Roles, 'name');
-            for (const iterator of user.Roles) {
-                permissionNames = _.map(iterator.permissions, 'name');
-            }
-            roleArray = user.Roles.map(function (obj) {
-                return {
-                    id: obj.role_id,
-                    name: obj.name,
-                    status: obj.status,
-                };
-            });
-
-            var userResponse = await new UserResponse(
-                user.id,
-                user.username,
-                user.name,
-                user.email_id,
-                user.enterprise_code,
-                user.status,
-                user.user_type,
-                roleNames,
-                permissionNames,
-                roleArray
-            );
+            const userResponse = await this.supportMethodForGetUser(user);
             userArray.push(userResponse);
         }
+        console.log('user array ', userArray);
         return userArray;
     }
 
     async getLoggedInUserDetails(userId) {
-        var roleNames = [];
-        var permissionNames = [];
-        var roleArray = [];
         const user = await User.findOne({
             attributes: [
                 'id',
@@ -305,30 +308,7 @@ class EnterpriseService {
                 },
             },
         });
-        roleNames = _.map(user.Roles, 'name');
-        for (const iterator of user.Roles) {
-            permissionNames = _.map(iterator.permissions, 'name');
-        }
-        roleArray = user.Roles.map(function (obj) {
-            return {
-                id: obj.role_id,
-                name: obj.name,
-                status: obj.status,
-            };
-        });
-
-        var userResponse = await new UserResponse(
-            user.id,
-            user.username,
-            user.name,
-            user.email_id,
-            user.enterprise_code,
-            user.status,
-            user.user_type,
-            roleNames,
-            permissionNames,
-            roleArray
-        );
+        const userResponse = await this.supportMethodForGetUser(user);
         return userResponse;
     }
 

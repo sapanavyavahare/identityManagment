@@ -62,29 +62,29 @@ class AuthJwt {
             return;
         });
     };
-    logout = (req, res) => {
-        let t;
-        if (!req.token) {
-            return res.status(401);
-        }
-        console.log(
-            'access token array befor delete token ',
-            config.accessTokens
-        );
-        if (config.accessTokens.includes(req.token)) {
-            config.accessTokens = config.accessTokens.filter(
-                (t) => t !== req.token
-            );
-            console.log(
-                'access token array after delete token ',
-                config.accessTokens
-            );
-            return res.send({
-                statusCode: 200,
-                message: 'successfully.logged.out.',
-            });
-        }
-    };
+    // logout = (req, res) => {
+    //     let t;
+    //     if (!req.token) {
+    //         return res.status(401);
+    //     }
+    //     console.log(
+    //         'access token array befor delete token ',
+    //         config.accessTokens
+    //     );
+    //     if (config.accessTokens.includes(req.token)) {
+    //         config.accessTokens = config.accessTokens.filter(
+    //             (t) => t !== req.token
+    //         );
+    //         console.log(
+    //             'access token array after delete token ',
+    //             config.accessTokens
+    //         );
+    //         return res.send({
+    //             statusCode: 200,
+    //             message: 'successfully.logged.out.',
+    //         });
+    //     }
+    // };
 }
 
 module.exports = AuthJwt;

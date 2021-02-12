@@ -21,7 +21,7 @@ describe('user and enterprise related endpoints ', () => {
             .post('/idm/api/roles')
             .set('authorization', 'Bearer ' + token)
             .send({
-                name: 'engNew9',
+                name: 'engNew10',
                 description: 'ddbjdbf',
                 permissionId: [1, 2, 4],
             });
@@ -34,8 +34,8 @@ describe('user and enterprise related endpoints ', () => {
             .post('/idm/api/users')
             .set('authorization', 'Bearer ' + token)
             .send({
-                name: 'swarnima',
-                username: 'swarnima-ORG',
+                name: 'rahul',
+                username: 'rahul-ORG',
                 emailId: 'sapana12.v@gmail.com',
                 roles: ['DPO'],
             });
@@ -46,11 +46,11 @@ describe('user and enterprise related endpoints ', () => {
         const res = await supertest(app)
             .post('/idm/api/enterprises/root')
             .send({
-                name: 'Infosis7',
+                name: 'Infosis8',
                 admin: {
                     emailId: 'sapana12.v@gmail.com',
-                    name: 'Infosis7',
-                    username: 'Infosis7-admin',
+                    name: 'Infosis8',
+                    username: 'Infosis8-admin',
                 },
             });
         expect(res.statusCode).toEqual(200);
@@ -61,7 +61,7 @@ describe('user and enterprise related endpoints ', () => {
             .post('/idm/api/passwordpolicies')
             .set('authorization', 'Bearer ' + token)
             .send({
-                policyName: 'TCS Policy11',
+                policyName: 'TCS Policy12',
                 description: 'Admin User',
                 minPasswordLength: 8,
                 minLowerAlphaChars: 3,
@@ -72,6 +72,31 @@ describe('user and enterprise related endpoints ', () => {
         expect(res.statusCode).toEqual(200);
     });
 
+    it('should not create new user with duplicate user name', async () => {
+        const res = await supertest(app)
+            .post('/idm/api/users')
+            .set('authorization', 'Bearer ' + token)
+            .send({
+                name: 'swarnima',
+                username: 'swarnima-ORG',
+                emailId: 'sapana12.v@gmail.com',
+                roles: ['DPO'],
+            });
+        expect(res.statusCode).toEqual(400);
+    });
+
+    it('should not create new user with that role which is not exist', async () => {
+        const res = await supertest(app)
+            .post('/idm/api/users')
+            .set('authorization', 'Bearer ' + token)
+            .send({
+                name: 'swarnima',
+                username: 'swarnima-ORG',
+                emailId: 'sapana12.v@gmail.com',
+                roles: ['OP'],
+            });
+        expect(res.statusCode).toEqual(400);
+    });
     //all get endpoints test cases
     it('should get all permissions', async () => {
         const res = await supertest(app)
@@ -125,8 +150,17 @@ describe('user and enterprise related endpoints ', () => {
         const res = await supertest(app)
             .get('/idm/api/users/list')
             .set('authorization', 'Bearer ' + token);
-
+        // console.log('res of user list ', res);
         expect(res.statusCode).toEqual(200);
+        expect(res.body).toHaveProperty('users');
+    });
+
+    it('should list all users ', async () => {
+        const res = await supertest(app)
+            .get('/idm/api/users')
+            .set('authorization', 'Bearer ' + token);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toHaveProperty('username');
     });
 
     //get enterprise details

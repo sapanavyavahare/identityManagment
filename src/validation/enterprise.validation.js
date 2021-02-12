@@ -40,7 +40,7 @@ class EnterpriseValidation {
         const value = await id.validate(req.params.id);
         console.log('value ', value);
         if (value.error) {
-            res.status(422).json({
+            return res.status(422).json({
                 statusCode: 422,
                 message: value.error.details[0].message,
             });
@@ -61,20 +61,6 @@ class EnterpriseValidation {
             next();
         }
     }
-
-    async createPasswordPolicyValidation(req, res, next) {
-        const value = await passowordPolicy.validate(req.body);
-        console.log('value ', value);
-        if (value.error) {
-            res.status(422).json({
-                statusCode: 422,
-                message: value.error.details[0].message,
-            });
-        } else {
-            next();
-        }
-    }
-
     async userPasswordValidation(req, res, next) {
         const value = await userPassword.validate(req.body);
         console.log('value ', value);

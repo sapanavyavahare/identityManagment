@@ -66,11 +66,7 @@ router.post(
     enterpriseValidation.createUserValidation,
     enterpriseConn.createUser
 );
-router.get(
-    '/users/list',
-    [authJwt.verifyToken, authJwt.isAdmin],
-    enterpriseConn.getUserList
-);
+router.get('/users/list', [authJwt.verifyToken], enterpriseConn.getUserList);
 router.get(
     '/users',
     authJwt.verifyToken,
@@ -167,6 +163,6 @@ router.post(
     enterpriseValidation.userPasswordValidation,
     enterpriseConn.authenticateUser
 );
-router.get('/logout', authJwt.verifyToken, authJwt.logout);
+//router.get('/logout', authJwt.verifyToken, authJwt.logout);
 
 module.exports = router;

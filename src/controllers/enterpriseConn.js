@@ -163,35 +163,11 @@ class EnterpriseController {
         }
     }
 
-    // async createEnterprise(req, res) {
-    //     try {
-    //         console.log(
-    //             'in conn create enterprise conntroller ',
-    //             req.enterpriseCode
-    //         );
-    //         const result = await enterpriseService.createRootEnterprise(
-    //             req.body,
-    //             req.enterpriseCode
-    //         );
-    //         logger.infoLog.info('Enterprise created successfully.');
-    //         res.send({
-    //             code: 201,
-    //             message: 'Enterprise created successfully.',
-    //             enterprise_code: result,
-    //             applicationErrorCode: 0,
-    //         });
-    //     } catch (err) {
-    //         logger.errorLog.error('Error while creating enterprise :: ', err);
-    //         return sendErrorRsp(res, {
-    //             code: 'DELETE_ROLE_FAILED',
-    //             message: 'Unable to delete role failed',
-    //             httpCode: 500,
-    //         });
-    //     }
-    // }
     async getUserList(req, res) {
         try {
-            const result = await enterpriseService.getUsers();
+            const result = await enterpriseService.getUsers(
+                req.user.enterprise_code
+            );
             logger.infoLog.info('result in conntroller in getuserList', {
                 result,
             });
@@ -217,7 +193,7 @@ class EnterpriseController {
                     result,
                 }
             );
-            res.send({ users: result });
+            res.send(result);
         } catch (err) {
             logger.errorLog.error('Error in getLoggedInUserDetails :: ', err);
             return sendErrorRsp(res, {

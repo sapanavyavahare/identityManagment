@@ -25,12 +25,6 @@ const enterpriseSchema = {
         username: joi.string().required(),
         roles: joi.array().items(joi.string().required()),
     }),
-
-    passowordPolicy: joi.object({
-        policyName: joi.string().required(),
-        description: joi.string().required(),
-    }),
-
     userPassword: joi.object({
         username: joi.string().required(),
         password: joi
